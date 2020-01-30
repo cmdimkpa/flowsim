@@ -24,7 +24,7 @@ maxCars = 1000
 maxSimulations = 2
 simulationSeconds = 60
 Thresholds = {
-    "CR":0.6
+    "CR":0.9
 }
 
 class FlowQueue:
@@ -119,21 +119,21 @@ for sim in range(maxSimulations):
     print("")
     print("SIM %s of %s: Flow1 total inflow = %s" % (sim+1, maxSimulations, Flow1.total_inflow))
     print("SIM %s of %s: Flow1 total outflow = %s" % (sim+1, maxSimulations, Flow1.total_outflow))
-    print("SIM %s of %s: Flow1 left on queue = %s" % (sim+1, maxSimulations, Flow1.total_inflow - Flow1.total_outflow))
+    print("SIM %s of %s: Flow1 Pass Rate = %s" % (sim+1, maxSimulations, '{}%'.format(round(100*Flow1.total_outflow/Flow1.total_inflow,2))))
     print("SIM %s of %s: Flow1 average CR = %s" % (sim+1, maxSimulations, average(Flow1.data["cr"])))
     print("SIM %s of %s: Flow1 times opened = %s" % (sim+1, maxSimulations, Flow1.data["opened"]))
     print("SIM %s of %s: Flow1 times closed = %s" % (sim+1, maxSimulations, Flow1.data["closed"]))
     print("")
     print("SIM %s of %s: Flow2 total inflow = %s" % (sim+1, maxSimulations, Flow2.total_inflow))
     print("SIM %s of %s: Flow2 total outflow = %s" % (sim+1, maxSimulations, Flow2.total_outflow))
-    print("SIM %s of %s: Flow2 left on queue = %s" % (sim+1, maxSimulations, Flow2.total_inflow - Flow2.total_outflow))
+    print("SIM %s of %s: Flow2 Pass Rate = %s" % (sim+1, maxSimulations, '{}%'.format(round(100*Flow2.total_outflow/Flow2.total_inflow,2))))
     print("SIM %s of %s: Flow2 average CR = %s" % (sim+1, maxSimulations, average(Flow2.data["cr"])))
     print("SIM %s of %s: Flow2 times opened = %s" % (sim+1, maxSimulations, Flow2.data["opened"]))
     print("SIM %s of %s: Flow2 times closed = %s" % (sim+1, maxSimulations, Flow2.data["closed"]))
     print("")
     print("SIM %s of %s: Flow3 total inflow = %s" % (sim+1, maxSimulations, Flow3.total_inflow))
     print("SIM %s of %s: Flow3 total outflow = %s" % (sim+1, maxSimulations, Flow3.total_outflow))
-    print("SIM %s of %s: Flow3 left on queue = %s" % (sim+1, maxSimulations, Flow3.total_inflow - Flow3.total_outflow))
+    print("SIM %s of %s: Flow3 Pass Rate = %s" % (sim+1, maxSimulations, '{}%'.format(round(100*Flow3.total_outflow/Flow3.total_inflow,2))))
     print("SIM %s of %s: Flow3 average CR = %s" % (sim+1, maxSimulations, average(Flow3.data["cr"])))
     print("SIM %s of %s: Flow3 times opened = %s" % (sim+1, maxSimulations, Flow3.data["opened"]))
     print("SIM %s of %s: Flow3 times closed = %s" % (sim+1, maxSimulations, Flow3.data["closed"]))
