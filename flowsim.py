@@ -20,27 +20,22 @@ def average(array):
         return 0
 
 # Constants
-maxCars = 100
+maxCars = 2000000
 maxSimulations = 2
-simulationSeconds = 600
+simulationSeconds = 100
 Thresholds = {
-    "CR":0.5,
-    "WT":10
+    "CR":0.45
 }
 
 class FlowQueue:
     def __init__(self):
         self.cars = []
         self.last_closed = None
-        self.last_opened = None
-        self.last_inflow = None
-        self.last_outflow = None
         self.isOpen = False
         self.total_inflow = 0
         self.total_outflow = 0
         self.data = {
-            "cr":[],
-            "wt":[]
+            "cr":[]
         }
     def size(self):
         return len(self.cars)
@@ -52,14 +47,6 @@ class FlowQueue:
             _cr = 0
         self.data["cr"].append(_cr)
         return _cr
-    def wt(self):
-        # store and return Waiting Time
-        if self.last_closed:
-            _wt = elapsed(self.last_closed)
-        else:
-            _wt = 0
-        self.data["wt"].append(_wt)
-        return _wt
     def inflow(self):
         # cannot inflow more than capacity of queue
         if self.size() < maxCars:
@@ -67,8 +54,6 @@ class FlowQueue:
             self.cars.append(self.size()+1)
             # increment total inflow
             self.total_inflow+=1
-            # log last inflow time
-            self.last_inflow = now()
     def outflow(self):
         # outflow is only possible if flow queue is open
         if self.isOpen and self.size()>0:
@@ -76,13 +61,9 @@ class FlowQueue:
             self.cars.pop()
             # increment total outflow
             self.total_outflow+=1
-            # log last outflow time
-            self.last_outflow = now()
     def open(self):
         # open flow queue
         self.isOpen = True
-        # log last opened
-        self.last_opened = now()
     def close(self):
         # close flow queue
         self.isOpen = False
@@ -118,7 +99,7 @@ for sim in range(maxSimulations):
         # Apply Flow Rules
 
         # Conditional CLOSE of Flow2 / OPEN Flow1 & Flow3
-        if Flow1.cr() > Thresholds["CR"] or Flow3.cr() > Thresholds["CR"] or Flow1.wt() > Thresholds["WT"] or Flow3.wt() > Thresholds["WT"]:
+        if Flow1.cr() > Thresholds["CR"] or Flow3.cr() > Thresholds["CR"]:
             Flow2.close()
             Flow1.open()
             Flow3.open()
@@ -128,9 +109,9 @@ for sim in range(maxSimulations):
             Flow1.close()
             Flow3.close()
         else:
-            if Flow1.cr() < Thresholds["CR"] or Flow1.wt() < Thresholds["WT"]:
+            if Flow1.cr() < Thresholds["CR"]:
                 Flow1.close()
-            if Flow3.cr() < Thresholds["CR"] or Flow3.wt() < Thresholds["WT"]:
+            if Flow3.cr() < Thresholds["CR"]:
                 Flow3.close()
             if not Flow1.isOpen and not Flow3.isOpen:
                 Flow2.open()
@@ -138,15 +119,15 @@ for sim in range(maxSimulations):
     print("")
     print("SIM %s of %s: Flow1 total inflow = %s" % (sim+1, maxSimulations, Flow1.total_inflow))
     print("SIM %s of %s: Flow1 total outflow = %s" % (sim+1, maxSimulations, Flow1.total_outflow))
+    print("SIM %s of %s: Flow1 left on queue = %s" % (sim+1, maxSimulations, Flow1.total_inflow - Flow1.total_outflow))
     print("SIM %s of %s: Flow1 average CR = %s" % (sim+1, maxSimulations, average(Flow1.data["cr"])))
-    print("SIM %s of %s: Flow1 average WT = %s" % (sim+1, maxSimulations, average(Flow1.data["wt"])))
     print("")
     print("SIM %s of %s: Flow2 total inflow = %s" % (sim+1, maxSimulations, Flow2.total_inflow))
     print("SIM %s of %s: Flow2 total outflow = %s" % (sim+1, maxSimulations, Flow2.total_outflow))
+    print("SIM %s of %s: Flow2 left on queue = %s" % (sim+1, maxSimulations, Flow2.total_inflow - Flow2.total_outflow))
     print("SIM %s of %s: Flow2 average CR = %s" % (sim+1, maxSimulations, average(Flow2.data["cr"])))
-    print("SIM %s of %s: Flow2 average WT = %s" % (sim+1, maxSimulations, average(Flow2.data["wt"])))
     print("")
     print("SIM %s of %s: Flow3 total inflow = %s" % (sim+1, maxSimulations, Flow3.total_inflow))
     print("SIM %s of %s: Flow3 total outflow = %s" % (sim+1, maxSimulations, Flow3.total_outflow))
+    print("SIM %s of %s: Flow3 left on queue = %s" % (sim+1, maxSimulations, Flow3.total_inflow - Flow3.total_outflow))
     print("SIM %s of %s: Flow3 average CR = %s" % (sim+1, maxSimulations, average(Flow3.data["cr"])))
-    print("SIM %s of %s: Flow3 average WT = %s" % (sim+1, maxSimulations, average(Flow3.data["wt"])))
