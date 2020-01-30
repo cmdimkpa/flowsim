@@ -20,11 +20,11 @@ def average(array):
         return 0
 
 # Constants
-maxCars = 2000000
+maxCars = 1000
 maxSimulations = 2
-simulationSeconds = 100
+simulationSeconds = 60
 Thresholds = {
-    "CR":0.45
+    "CR":0.6
 }
 
 class FlowQueue:
@@ -35,7 +35,9 @@ class FlowQueue:
         self.total_inflow = 0
         self.total_outflow = 0
         self.data = {
-            "cr":[]
+            "cr":[],
+            "opened":0,
+            "closed":0
         }
     def size(self):
         return len(self.cars)
@@ -46,7 +48,7 @@ class FlowQueue:
         else:
             _cr = 0
         self.data["cr"].append(_cr)
-        return _cr
+        return average(self.data["cr"])
     def inflow(self):
         # cannot inflow more than capacity of queue
         if self.size() < maxCars:
@@ -62,12 +64,16 @@ class FlowQueue:
             # increment total outflow
             self.total_outflow+=1
     def open(self):
+        if not self.isOpen:
+            self.data["opened"]+=1
         # open flow queue
         self.isOpen = True
     def close(self):
+        if self.isOpen:
+            self.data["closed"]+=1
         # close flow queue
         self.isOpen = False
-        # log last opened
+        # log last closed
         self.last_closed = now()
 
 # Simulation Relay
@@ -96,38 +102,38 @@ for sim in range(maxSimulations):
         if random() > 0.5:
             Flow3.outflow()
 
-        # Apply Flow Rules
-
-        # Conditional CLOSE of Flow2 / OPEN Flow1 & Flow3
+        # Apply Flow Rules: Conditional CLOSE of Flow2 / OPEN Flow1 & Flow3
         if Flow1.cr() > Thresholds["CR"] or Flow3.cr() > Thresholds["CR"]:
             Flow2.close()
             Flow1.open()
             Flow3.open()
-
-        # CLOSE Flow1 and Flow3 if Flow2 is OPEN else check OPENing conditions
-        if Flow2.isOpen:
+        else:
+            Flow2.open()
             Flow1.close()
             Flow3.close()
-        else:
-            if Flow1.cr() < Thresholds["CR"]:
-                Flow1.close()
-            if Flow3.cr() < Thresholds["CR"]:
-                Flow3.close()
-            if not Flow1.isOpen and not Flow3.isOpen:
-                Flow2.open()
+
+        # update Flow2
+        Flow2.cr()
+
     # report findings
     print("")
     print("SIM %s of %s: Flow1 total inflow = %s" % (sim+1, maxSimulations, Flow1.total_inflow))
     print("SIM %s of %s: Flow1 total outflow = %s" % (sim+1, maxSimulations, Flow1.total_outflow))
     print("SIM %s of %s: Flow1 left on queue = %s" % (sim+1, maxSimulations, Flow1.total_inflow - Flow1.total_outflow))
     print("SIM %s of %s: Flow1 average CR = %s" % (sim+1, maxSimulations, average(Flow1.data["cr"])))
+    print("SIM %s of %s: Flow1 times opened = %s" % (sim+1, maxSimulations, Flow1.data["opened"]))
+    print("SIM %s of %s: Flow1 times closed = %s" % (sim+1, maxSimulations, Flow1.data["closed"]))
     print("")
     print("SIM %s of %s: Flow2 total inflow = %s" % (sim+1, maxSimulations, Flow2.total_inflow))
     print("SIM %s of %s: Flow2 total outflow = %s" % (sim+1, maxSimulations, Flow2.total_outflow))
     print("SIM %s of %s: Flow2 left on queue = %s" % (sim+1, maxSimulations, Flow2.total_inflow - Flow2.total_outflow))
     print("SIM %s of %s: Flow2 average CR = %s" % (sim+1, maxSimulations, average(Flow2.data["cr"])))
+    print("SIM %s of %s: Flow2 times opened = %s" % (sim+1, maxSimulations, Flow2.data["opened"]))
+    print("SIM %s of %s: Flow2 times closed = %s" % (sim+1, maxSimulations, Flow2.data["closed"]))
     print("")
     print("SIM %s of %s: Flow3 total inflow = %s" % (sim+1, maxSimulations, Flow3.total_inflow))
     print("SIM %s of %s: Flow3 total outflow = %s" % (sim+1, maxSimulations, Flow3.total_outflow))
     print("SIM %s of %s: Flow3 left on queue = %s" % (sim+1, maxSimulations, Flow3.total_inflow - Flow3.total_outflow))
     print("SIM %s of %s: Flow3 average CR = %s" % (sim+1, maxSimulations, average(Flow3.data["cr"])))
+    print("SIM %s of %s: Flow3 times opened = %s" % (sim+1, maxSimulations, Flow3.data["opened"]))
+    print("SIM %s of %s: Flow3 times closed = %s" % (sim+1, maxSimulations, Flow3.data["closed"]))
